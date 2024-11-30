@@ -30,7 +30,9 @@ try {
 - 该文件用于连接 MySQL 数据库，使用 PDO 进行安全的数据库操作。
 
 ### 2. 用户登录
-**`login.php`**<?php
+**`login.php`**
+```
+<?php
 require 'db_connect.php';
 
 header('Content-Type: application/json');
@@ -74,9 +76,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     echo json_encode(['success' => false, 'message' => 'Method Not Allowed']);
 }
 ?>
+```
 - 处理用户登录请求，验证用户的电子邮件和验证码。
 ### 3. 游戏记录
 **`insert_records.php`**
+```
 <?php
 require 'db_connect.php';
 session_start();
@@ -134,9 +138,11 @@ echo json_encode([
     'worldRecords' => $worldRecords
 ]);
 ?>
+```
 - 提供个人历史记录和世界记录的接口，返回 JSON 格式的数据。
 ### 5. 前端代码
 **`leaderboard/script.js`**
+```
 document.addEventListener('DOMContentLoaded', function() {
     const tabBtns = document.querySelectorAll('.tab-btn');
     const leaderboards = document.querySelectorAll('.leaderboard');
@@ -185,9 +191,11 @@ function fetchLeaderboard(type) {
         })
         .catch(error => console.error('Error:', error));
 }
+```
 - 处理排行榜的前端逻辑，包括切换标签和获取排行榜数据。
 ### 6. 样式文件
 **`styles.css`**
+```
 body {
     font-family: Arial, sans-serif;
     display: flex;
@@ -206,6 +214,7 @@ body {
     max-width: 32rem;
     width: 100%;
 }
+```
 - 定义了页面的基本样式，包括字体、背景颜色和容器样式。
 ## 结论
 该项目展示了如何使用 PHP 和 MySQL 创建一个简单的在线游戏记录系统。用户可以登录、注册、记录游戏成绩并查看排行榜。欢迎大家参与贡献和改进！
