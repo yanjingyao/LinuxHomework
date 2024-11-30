@@ -114,6 +114,7 @@ function isValidBoard(board) {
 boardSizeSelect.addEventListener('change', (event) => {
     const selectedSize = parseInt(event.target.value); // 获取选择的棋盘大小
     initializeBoard(selectedSize); // 根据选择的大小重新初始化棋盘
+    stopTimer()
 });
 
 
