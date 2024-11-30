@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOXX 游戏</title>
+    
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="listtable.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+</head>
+<body>
+    <canvas id="particles-js"></canvas>
+    <div class="container">
+        <h1>OOXX 游戏</h1>
+        <div id="auth-container">
+            <div id="login-form">
+                <h2>登录</h2>
+                <input type="email" id="login-email" placeholder="邮箱" required>
+                <input type="text" id="login-code" placeholder="验证码" required>
+                <button id="login-send-code">发送验证码</button>
+                <button id="login-submit">登录</button>
+            </div>
+            <div id="register-form" style="display: none;">
+                <h2>注册</h2>
+                <input type="email" id="register-email" placeholder="邮箱" required>
+                <input type="text" id="register-username" placeholder="用户名" required>
+                <input type="text" id="register-code" placeholder="验证码" required>
+                <button id="register-send-code">发送验证码</button>
+                <button id="register-submit">注册</button>
+            </div>
+            <p id="auth-toggle">没有账号？ <a href="#" id="show-register">注册</a></p>
+            <button id="guest-play">游客模式</button>
+        </div>
+        
+        <div id="game-container" style="display: none;">
+            <div id="timer" class="timer">00:00:00</div>
+            <div class="controls">
+                <select id="board-size">
+                    <option value="6">6x6</option>
+                    <option value="8">8x8</option>
+                    <option value="10">10x10</option>
+                </select>
+                <button class="hint-button" id="hint-button">提示</button>
+            </div>
+            <div id="board" class="board size-6"></div>
+            <div class="game-controls">
+                <button class="check-solution" id="check-solution">检查解答</button>
+                <button class="reset-game" id="reset-games">重置游戏</button>
+                <button id="return-to-login" style="display: none;">返回登录</button>
+                <button id="logout-button" style="display: none;">注销</button>
+            </div>
+        </div>
+        <div id="message" class="message" style="display: none;"></div>
+    </div>
+    
+    <div class="leaderboards" id="leaderboards">
+        <div class="card">
+            <h2>个人历史最高</h2>
+            <div class="scroll-area">
+                <table id="personal-history">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>分数</th>
+                            <th>日期</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 个人历史数据将在这里动态插入 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card">
+            <h2>世界记录排行榜</h2>
+            <div class="scroll-area">
+                <table id="world-records">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>用户名</th>
+                            <th>分数</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- 世界记录数据将在这里动态插入 -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="listtable.js"></script>
+    <script src="particles.js"></script>
+    <script>
+        console.log(resetGameButton); // 确认按钮是否被正确引用
+        resetGameButton.addEventListener('click', (event) => {
+            event.preventDefault(); // 防止默认行为
+            resetGame(); // 调用重置游戏函数
+        });
+
+        
+        $(document).ready(function() {
+            let isGuest = false;
+
+            // 检查用户是否已登录
+            $.ajax({
+                url: 'check_login.php',
+                method: 'GET',
+                success: function(response) {
+                    if (response.success) {
+                        // 用户已登录，加载
+                        showMessage(`欢迎回来, ${response.username}`, 'success');
+                        $('#auth-container').hide();
+                        $('#game-container, #leaderboard-container,#leaderboards').show();
+                        initializeBoard(6); // 默认6x6棋盘
+                        $('#logout-button').show();
+                    } else {
+                        // 用户未登录，显示登录表单
+                        $('#auth-container').show();
+                        $('#game-container, #leaderboard-container,#leaderboards').hide();
+                    }
+                },
+                error: function() {
+                    showMessage('检查登录状态失败，请稍后重试', 'error');
+                }
+            });
+
+            // 切换注册表单
+            $(document).on('click', '#show-register', function(e) {
+                e.preventDefault();
+                $('#login-form').hide();
+                $('#register-form').show();
+                $('#auth-toggle').html('已有账号？ <a href="#" id="show-login">登录</a>');
+            });
+
+            // 切换登录表单
+            $(document).on('click', '#show-login', function(e) {
+                e.preventDefault();
+                $('#register-form').hide();
+                $('#login-form').show();
+                $('#auth-toggle').html('没有账号？ <a href="#" id="show-register">注册</a>');
+            });
+
+            // 发送验证码（登录）
+            $('#login-send-code').click(function() {
+                sendVerificationCode($('#login-email').val(), 'login');
+            });
+
+            // 发送验证码（注册）
+            $('#register-send-code').click(function() {
+                const email = $('#register-email').val();
+                if (email) {
+                    sendVerificationCode(email, 'register');
+                } else {
+                    showMessage('请输入有效的邮箱地址', 'error');
+                }
+            });
+
+            // 登录
+            $('#login-submit').click(function() {
+                login($('#login-email').val(), $('#login-code').val());
+            });
+
+            // 注册
+            $('#register-submit').click(function() {
+                const email = $('#register-email').val();
+                const username = $('#register-username').val();
+                const code = $('#register-code').val();
+                if (email && username && code) {
+                    register(email, username, code);
+                } else {
+                    showMessage('请填写所有字段', 'error');
+                }
+            });
+
+            // 游客模式
+            $('#guest-play').click(function() {
+                isGuest = true;
+                $('#auth-container').hide();
+                $('#game-container').show();
+                $('#return-to-login').show();
+                initializeBoard(6); // 默认6x6棋盘
+            });
+
+            // 返回登录
+            $('#return-to-login').click(function() {
+                isGuest = false;
+                $('#game-container').hide();
+                $('#auth-container').show();
+                $('#return-to-login').hide();
+                stopTimer();
+            });
+
+            // 发送验证码
+            function sendVerificationCode(email, type) {
+                $.ajax({
+                    url: './PHPEmail/send_email.php',
+                    method: 'POST',
+                    data: JSON.stringify({ email: email }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            showMessage(response.message, 'success');
+                        } else {
+                            showMessage(response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showMessage('发送验证码失败，请稍后重试', 'error');
+                    }
+                });
+            }
+
+            // 登录
+            function login(email, code) {
+                $.ajax({
+                    url: 'login.php',
+                    method: 'POST',
+                    data: JSON.stringify({ email: email, verificationCode: code }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            showMessage('登录成功', 'success');
+                            $('#auth-container').hide();
+                            $('#game-container, #leaderboard-container,#leaderboards').show();
+                            $('#logout-button').show();
+                            initializeBoard(6); // 默认6x6棋盘
+                        } else {
+                            showMessage(response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showMessage('登录失败，请稍后重试', 'error');
+                    }
+                });
+            }
+
+            // 注册
+            function register(email, username, code) {
+                $.ajax({
+                    url: 'register.php',
+                    method: 'POST',
+                    data: JSON.stringify({ email: email, username: username, verificationCode: code }),
+                    contentType: 'application/json',
+                    success: function(response) {
+                        if (response.success) {
+                            showMessage('注册成功，请登录', 'success');
+                            $('#register-form').hide();
+                            $('#login-form').show();
+                            $('#auth-toggle').html('没有账号？ <a href="#" id="show-register">注册</a>');
+                        } else {
+                            showMessage(response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showMessage('注册失败，请稍后重试', 'error');
+                    }
+                });
+            }
+
+            // 格式化时间
+            function formatTime(seconds) {
+                const minutes = Math.floor(seconds / 60);
+                const remainingSeconds = seconds % 60;
+                return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
+            }
+
+            // 显示消息
+            function showMessage(text, type) {
+                $('#message').text(text).removeClass().addClass(`message ${type}`).show();
+                setTimeout(() => {
+                    $('#message').hide();
+                }, 3000);
+            }
+
+            // 检查解答
+            $('#check-solution').click(function() {
+                if (checkSolution()) {
+                    const elapsedTime = Math.floor((Date.now() - startTime) / 1000);
+                    showMessage(`恭喜！你解开了谜题！用时：${formatTime(elapsedTime)}`, 'success');
+                    stopTimer();
+                    $.ajax({
+                        url: 'insert_records.php', // 指向插入记录的 PHP 文件
+                        method: 'POST',
+                        data: JSON.stringify({ username: 'player1', score: formattedTime }), // 替换 'player1' 为实际用户名
+                        contentType: 'application/json',
+                        success: function(response) {
+                            showMessage(response, 'success');
+                            refreshLeaderboards(); // 刷新排行榜
+                        },
+                        error: function() {
+                            showMessage('插入记录失败，请稍后重试', 'error');
+                        }
+                    });
+
+                    if (!isGuest) {
+                        updateBestTime(elapsedTime);
+                    }
+                }
+            });
+                    
+            //     }
+            // });
+
+            // 注销
+            $('#logout-button').click(function() {
+                $.ajax({
+                    url: 'logout.php', // 指向注销处理的 PHP 文件
+                    method: 'POST',
+                    success: function(response) {
+                        if (response.success) {
+                            showMessage('注销成功', 'success');
+                            $('#auth-container').show();
+                            $('#game-container, #leaderboard-container,#leaderboards').hide();
+                            $('#logout-button').hide(); // 隐藏注销按钮
+                        } else {
+                            showMessage(response.message, 'error');
+                        }
+                    },
+                    error: function() {
+                        showMessage('注销失败，请稍后重试', 'error');
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

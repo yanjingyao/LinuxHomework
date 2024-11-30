@@ -1,0 +1,68 @@
+.main-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 100vh;
+}
+
+.game-wrapper {
+    flex: 1;
+}
+
+.scoreboard {
+    width: 300px;
+    padding: 20px;
+    background-color: #bbada0;
+    border-left: 2px solid #8f7a66;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: -2px 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.scoreboard h2 {
+    font-size: 18px;
+    color: #f9f6f2;
+    margin-bottom: 15px;
+    text-align: center;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.scoreboard ol {
+    list-style-type: none;
+    padding: 0;
+}
+
+.scoreboard li {
+    background-color: #eee4da;
+    margin-bottom: 10px;
+    padding: 10px;
+    border-radius: 5px;
+    font-size: 14px;
+    color: #776e65;
+    display: flex;
+    justify-content: space-between;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.scoreboard li:nth-child(even) {
+    background-color: #ede0c8;
+}
+
+.scoreboard .score-value {
+    font-weight: bold;
+    color: #f65e3b;
+}
+
+.high-scores, .personal-scores {
+    background-color: rgba(238, 228, 218, 0.5);
+    border-radius: 6px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
+.high-scores h2, .personal-scores h2 {
+    color: #776e65;
+    text-shadow: none;
+}

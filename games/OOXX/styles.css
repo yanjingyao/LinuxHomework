@@ -1,0 +1,307 @@
+body {
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    margin: 0;
+    background-color: #f3f4f6;
+    position: relative;
+
+}
+#particles-js {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.container {
+    background-color: white;
+    padding: 1.5rem;
+    border-radius: 0.5rem;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 32rem;
+    width: 100%;
+    position: relative;
+    z-index: 1;
+    
+}
+h1 {
+    text-align: center;
+    font-size: 1.875rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+}
+.controls {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 1rem;
+}
+select, button {
+    padding: 0.5rem 1rem;
+    border-radius: 0.25rem;
+    border: 1px solid #d1d5db;
+    background-color: white;
+    font-size: 0.875rem;
+}
+button {
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+button:hover {
+    background-color: #f3f4f6;
+}
+.hint-button {
+    background-color: #8b5cf6;
+    color: white;
+}
+.hint-button:hover {
+    background-color: #7c3aed;
+}
+.board {
+    display: grid;
+    gap: 0.125rem;
+    margin-bottom: 1rem;
+}
+.board.size-6 {
+    grid-template-columns: repeat(6, 1fr);
+}
+.board.size-8 {
+    grid-template-columns: repeat(8, 1fr);
+}
+.board.size-10 {
+    grid-template-columns: repeat(10, 1fr); /* 添加 10x10 的样式 */
+}
+.cell {
+    aspect-ratio: 1 / 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 1.125rem;
+    font-weight: bold;
+    background-color: #e5e7eb;
+    border: none;
+    border-radius: 0.25rem;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.cell:hover {
+    transform: scale(1.05);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.cell.x {
+    background-color: #3b82f6;
+    color: white;
+}
+.cell.o {
+    background-color: #ef4444;
+    color: white;
+}
+.game-controls {
+    display: flex;
+    justify-content: space-between;
+}
+.check-solution, .reset-game {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 0.25rem;
+    color: white;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+.check-solution {
+    background-color: #10b981;
+}
+.check-solution:hover {
+    background-color: #059669;
+}
+.reset-game {
+    background-color: #f59e0b;
+}
+.reset-game:hover {
+    background-color: #d97706;
+}
+.message {
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+}
+.message.error {
+    color: #ef4444;
+}
+.message.success {
+    color: #10b981;
+}
+.message::before {
+    content: '';
+    display: inline-block;
+    width: 1rem;
+    height: 1rem;
+    margin-right: 0.25rem;
+    background-size: contain;
+}
+.message.error::before {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>');
+}
+.message.success::before {
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>');
+}
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    overflow: auto;
+    background-color: rgba(0,0,0,0.4);
+}
+.modal-content {
+    background-color: #fefefe;
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    max-width: 500px;
+    border-radius: 0.5rem;
+}
+.close {
+    color: #aaa;
+    float: right;
+    font-size: 28px;
+    font-weight: bold;
+    cursor: pointer;
+}
+.close:hover,
+.close:focus {
+    color: black;
+    text-decoration: none;
+    cursor: pointer;
+}
+.timer {
+    text-align: center;
+    font-size: 1.25rem;
+    font-weight: bold;
+    margin-bottom: 1rem;
+    color: #4b5563;
+}
+
+
+/* 输入框样式 */
+input[type="email"],
+input[type="text"] {
+    padding: 12px; /* 增加内边距 */
+    margin: 10px 0; /* 上下间距 */
+    border: 1px solid #d1d5db; /* 边框颜色 */
+    border-radius: 0.25rem; /* 圆角 */
+    font-size: 1rem; /* 字体大小 */
+    transition: border-color 0.2s, box-shadow 0.2s; /* 边框颜色和阴影过渡效果 */
+}
+
+input[type="email"]:focus,
+input[type="text"]:focus {
+    border-color: #8b5cf6; /* 聚焦时边框颜色 */
+    box-shadow: 0 0 5px rgba(139, 92, 246, 0.5); /* 聚焦时阴影效果 */
+    outline: none; /* 去掉默认轮廓 */
+}
+
+/* 为登录按钮添加上边距 */
+#login-submit {
+    margin-top: 10px; /* 上边距 10px */
+    padding: 12px; /* 增加内边距 */
+    border: none; /* 去掉边框 */
+    border-radius: 0.25rem; /* 圆角 */
+    background-color: #8b5cf6; /* 按钮背景颜色 */
+    color: white; /* 字体颜色 */
+    font-size: 1rem; /* 字体大小 */
+    cursor: pointer; /* 鼠标指针 */
+    transition: background-color 0.2s, transform 0.2s; /* 背景颜色和缩放过渡效果 */
+}
+
+#login-submit:hover {
+    background-color: #7c3aed; /* 悬停时按钮颜色 */
+    transform: translateY(-2px); /* 悬停时向上移动 */
+}
+
+#login-submit:active {
+    transform: translateY(0); /* 点击时恢复位置 */
+}
+
+
+/* 表单样式 */
+#login-form, #register-form {
+    display: flex;
+    flex-direction: column;
+}
+
+/* 发送验证码按钮 */
+#login-send-code{
+    margin-top: 10px; /* 上边距 10px */
+    padding: 12px; /* 增加内边距 */
+    border: none; /* 去掉边框 */
+    border-radius: 0.25rem; /* 圆角 */
+    background-color: #8b5cf6; /* 按钮背景颜色 */
+    color: white; /* 字体颜色 */
+    font-size: 1rem; /* 字体大小 */
+    cursor: pointer; /* 鼠标指针 */
+    transition: background-color 0.2s, transform 0.2s; /* 背景颜色和缩放过渡效果 */
+}
+
+#login-send-code:hover {
+    background-color: #7c3aed; /* 悬停时按钮颜色 */
+    transform: translateY(-2px); /* 悬停时向上移动 */
+}
+
+#login-send-code:active {
+    transform: translateY(0); /* 点击时恢复位置 */
+}
+
+/* register-send-code 注册页面发送验证码按钮*/
+#register-send-code{
+    margin-top: 10px; /* 上边距 10px */
+    padding: 12px; /* 增加内边距 */
+    border: none; /* 去掉边框 */
+    border-radius: 0.25rem; /* 圆角 */
+    background-color: #8b5cf6; /* 按钮背景颜色 */
+    color: white; /* 字体颜色 */
+    font-size: 1rem; /* 字体大小 */
+    cursor: pointer; /* 鼠标指针 */
+    transition: background-color 0.2s, transform 0.2s; /* 背景颜色和缩放过渡效果 */
+}
+
+#register-send-code:hover {
+    background-color: #7c3aed; /* 悬停时按钮颜色 */
+    transform: translateY(-2px); /* 悬停时向上移动 */
+}
+
+#register-send-code:active {
+    transform: translateY(0); /* 点击时恢复位置 */
+}
+
+/* register-submit 注册页面发送注册按钮*/
+
+#register-submit{
+    margin-top: 10px; /* 上边距 10px */
+    padding: 12px; /* 增加内边距 */
+    border: none; /* 去掉边框 */
+    border-radius: 0.25rem; /* 圆角 */
+    background-color: #8b5cf6; /* 按钮背景颜色 */
+    color: white; /* 字体颜色 */
+    font-size: 1rem; /* 字体大小 */
+    cursor: pointer; /* 鼠标指针 */
+    transition: background-color 0.2s, transform 0.2s; /* 背景颜色和缩放过渡效果 */
+}
+
+#register-submit:hover {
+    background-color: #7c3aed; /* 悬停时按钮颜色 */
+    transform: translateY(-2px); /* 悬停时向上移动 */
+}
+
+#register-submit:active {
+    transform: translateY(0); /* 点击时恢复位置 */
+}

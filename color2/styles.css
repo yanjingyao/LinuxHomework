@@ -1,0 +1,175 @@
+body {
+    margin: 0;
+}
+ 
+h1 {
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    letter-spacing: 2px;
+    font-size: 48px;
+}
+p {
+    font-family: 'Lato', sans-serif;
+    letter-spacing: 1px;
+    font-size: 14px;
+    color: #333333;
+}
+ 
+.header {
+    position: relative;
+    text-align: center;
+    background: linear-gradient(60deg, rgba(84, 58, 183, 1) 0%, rgba(0, 172, 193, 1) 100%);
+/* 	background: #FFAFBD;  
+	background: -webkit-linear-gradient(to right, #ffc3a0, #FFAFBD);  
+	background: linear-gradient(to right, #ffc3a0, #FFAFBD); 
+ */
+    color: white;
+}
+.logo {
+    width: 50px;
+    fill: white;
+    padding-right: 15px;
+    display: inline-block;
+    vertical-align: middle;
+}
+ 
+.inner-header {
+    height: 30vh; /* 内部标题的高度 */
+    width: 100%; /* 宽度 */
+    margin: 0; /* 外边距 */
+    padding: 0; /* 内边距 */
+    display: flex; /* 使用 Flexbox */
+    flex-direction: column; /* 垂直布局 */
+    justify-content: center; /* 垂直居中对齐 */
+    align-items: center; /* 水平居中对齐 */
+}
+ 
+.flex {
+    /*Flexbox for containers*/
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
+ 
+.waves {
+    position: relative;
+    width: 100%;
+    height: 15vh;
+    margin-bottom: -7px; /*Fix for safari gap*/
+    min-height: 100px;
+    max-height: 150px;
+}
+ 
+.content {
+    position: relative;
+    height: 20vh;
+    text-align: center;
+    background-color: white;
+}
+ 
+.content a {
+    margin: 0 5px;
+    font-size: 12px;
+    color: #333;
+}
+ 
+.content a:hover {
+    color: #000;
+}
+ 
+/* Animation */
+ 
+.parallax > use {
+    animation: move-forever 25s cubic-bezier(0.55, 0.5, 0.45, 0.5) infinite;
+}
+.parallax > use:nth-child(1) {
+    animation-delay: -2s;
+    animation-duration: 7s;
+}
+.parallax > use:nth-child(2) {
+    animation-delay: -3s;
+    animation-duration: 10s;
+}
+.parallax > use:nth-child(3) {
+    animation-delay: -4s;
+    animation-duration: 13s;
+}
+.parallax > use:nth-child(4) {
+    animation-delay: -5s;
+    animation-duration: 20s;
+}
+@keyframes move-forever {
+    0% {
+        transform: translate3d(-90px, 0, 0);
+    }
+    100% {
+        transform: translate3d(85px, 0, 0);
+    }
+}
+/*Shrinking for mobile*/
+@media (max-width: 768px) {
+    .waves {
+        height: 40px;
+        min-height: 40px;
+    }
+    .content {
+        height: 30vh;
+    }
+    h1 {
+        font-size: 24px;
+    }
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(15, 1fr); /* 创建 15 列相等的网格 */
+    gap: 0; /* 网格项之间的间距 */
+    width: 430px; /* 网格容器的固定宽度 */
+    height: 430px; /* 网格容器的固定高度 */
+    margin: 10px auto; /* 居中网格容器 */
+    overflow: hidden; /* 隐藏溢出内容 */
+    border: 10px solid #ffffff; /* 白色外边框 */
+    border-radius: 5px; /* 可选：容器的圆角 */
+}
+
+.grid-item {
+    background-color: #ffffff; /* 网格项的白色背景 */
+    display: flex; /* 使用 Flexbox 居中内容 */
+    justify-content: center; /* 水平居中 */
+    align-items: center; /* 垂直居中 */
+    height: 26.67px; /* 网格项的高度 */
+    width: 26.67px; /* 网格项的宽度，使其为正方形 */
+    font-size: 18px; /* 数字的字体大小 */
+    color: #5c7fdf; /* 数字的蓝色 */
+    transition: background-color 0.3s; /* 悬停效果的平滑过渡 */
+    font-weight: bold; /* 使数字加粗 */
+    border: 1px solid #d3d3d3; /* 白灰色的边框 */
+    border-radius: 0; /* 不使用圆角 */
+}
+
+.grid-item:hover {
+    background-color: #e0e0e0; /* 悬停时更改背景颜色 */
+    color: #ff0000; /* 悬停时更改文本颜色 */
+}
+
+.reset-button {
+    background-color: #4CAF50; /* 按钮的背景颜色 */
+    color: white; /* 按钮文本颜色 */
+    border: none; /* 去掉默认边框 */
+    padding: 10px 20px; /* 内边距 */
+    text-align: center; /* 文本居中 */
+    text-decoration: none; /* 去掉下划线 */
+    display: inline-block; /* 使按钮为块级元素 */
+    font-size: 16px; /* 字体大小 */
+    margin: 10px 2px; /* 外边距 */
+    cursor: pointer; /* 鼠标悬停时显示手型 */
+    border-radius: 5px; /* 圆角 */
+    transition: background-color 0.3s, transform 0.2s; /* 平滑过渡效果 */
+}
+
+.reset-button:hover {
+    background-color: #45a049; /* 悬停时的背景颜色 */
+    transform: scale(1.05); /* 悬停时放大效果 */
+}
+
