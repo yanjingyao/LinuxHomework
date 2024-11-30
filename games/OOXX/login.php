@@ -41,26 +41,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     http_response_code(405);
     echo json_encode(['success' => false, 'message' => 'Method Not Allowed']);
 }
-
-// // 检查用户是否已登录
-// if (!isset($_SESSION['user_id'])) {
-//     // 用户未登录，重定向到登录页面或显示错误消息
-//     header('Location: login.php'); // 或者 echo json_encode(['success' => false, 'message' => 'Please log in first']);
-//     exit;
-// }
-
-// // 用户已登录，可以访问该页面
-// echo "Welcome, " . $_SESSION['username'];
-
-// // 设置会话过期时间（例如，30分钟）
-// $timeout_duration = 1800; // 30分钟
-
-// if (isset($_SESSION['LAST_ACTIVITY']) && (time() - $_SESSION['LAST_ACTIVITY'] > $timeout_duration)) {
-//     // 超过过期时间，注销用户
-//     session_unset(); // 清除会话变量
-//     session_destroy(); // 销毁会话
-//     header('Location: login.php'); // 重定向到登录页面
-//     exit;
-// }
-
-// $_SESSION['LAST_ACTIVITY'] = time(); // 更新最后活动时间

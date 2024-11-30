@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OOXX游戏排行榜</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>OOXX游戏排行榜</h1>
+            <p class="subtitle">挑战自我，超越巅峰</p>
+        </header>
+        <div class="tabs">
+            <button class="tab-btn active" data-tab="personal">
+                <i class="fas fa-user"></i>
+                个人游戏历史
+            </button>
+            <button class="tab-btn" data-tab="world">
+                <i class="fas fa-globe"></i>
+                世界最高排名
+            </button>
+        </div>
+        <div id="personal" class="leaderboard active">
+            <h2>个人游戏历史</h2>
+            <div class="table-container">
+                <table id="personal-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>用户名</th>
+                            <th>游戏用时</th>
+                            <th>日期</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+        <div id="world" class="leaderboard">
+            <h2>世界最高排名</h2>
+            <div class="table-container">
+                <table id="world-table">
+                    <thead>
+                        <tr>
+                            <th>排名</th>
+                            <th>用户名</th>
+                            <th>游戏用时</th>
+                            <th>日期</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>

@@ -18,6 +18,9 @@ const closeModal = document.getElementsByClassName('close')[0];
 
 let isGameSolved = false; // 新增：跟踪游戏是否已解开
 
+let personalHistory = []; // 使用 let 声明
+let worldRecords = []; // 使用 let 声明
+
 /**
  * 寻找下一个空格
  * @param {Array} board - 当前棋盘
@@ -278,7 +281,7 @@ function isValidPlacement(board, row, col, value) {
         console.log(`[${row}, ${col}] 位置的行或列有超过三个连续相同的字符`);
     }
 
-    // 检查是否有重复行或列，只有在棋盘已填充时才检查
+    // 检查是否有重复行或列，只棋盘已填充时才检查
     const hasDuplicateRowsCheck = board[row].every(cell => cell !== '') && hasDuplicateRows(board);
     const hasDuplicateColsCheck = board[col].every(cell => cell !== '') && hasDuplicateCols(board);
 
@@ -525,12 +528,39 @@ function checkSolution() {
     }
 
     stopTimer(); // 停止计时
-    showMessage(`恭喜！你解开了谜题！用时：${timerElement.textContent}`, 'success');
-    // refreshLeaderboards(); // 刷新排行榜
-    
-    alert(`恭喜！你解开了谜题！用时：${timerElement.textContent}`);
+    const formattedTime = timerElement.textContent; // 获取用时
+    const validTime = formatTime(formattedTime); // 格式化时间为 HH:MM:SS
+    showMessage(`恭喜！你解开了谜题！用时：${validTime}`, 'success');  
+    alert(`恭喜！你解开了谜题！用时：${validTime}`);
+
+    // 发送记录到 insert_records.php
+    sendRecord(validTime);
+
     resetGame(); // 重置游戏
     isGameSolved = false; // 设置游戏已解关闭的标志
+}
+
+// 新增：格式化时间为 HH:MM:SS
+function formatTime(time) {
+    const parts = time.split(':');
+    let hours = parseInt(parts[0], 10);
+    let minutes = parseInt(parts[1], 10);
+    let seconds = parseInt(parts[2], 10);
+
+    // 确保秒数不超过59
+    if (seconds >= 60) {
+        minutes += Math.floor(seconds / 60);
+        seconds = seconds % 60;
+    }
+
+    // 确保分钟数不超过59
+    if (minutes >= 60) {
+        hours += Math.floor(minutes / 60);
+        minutes = minutes % 60;
+    }
+
+    // 返回格式化后的时间
+    return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
 }
 
 /**
@@ -593,53 +623,6 @@ function resetGame() {
 }
 
 
-// 新增功能：排行榜功能
-async function refreshLeaderboards() {
-    try {
-        const response = await fetch('get_leaderboards.php');
-        const data = await response.json(); // 假设返回 JSON 格式的数据
-
-        // 更新排行榜
-        personalHistory = data.personalHistory;
-        worldRecords = data.worldRecords;
-
-        populatePersonalHistory();
-        populateWorldRecords();
-    } catch (error) {
-        showMessage('刷新排行榜失败，请稍后重试', 'error');
-        console.error('刷新排行榜失败:', error);
-    }
-}
-
-
-/**
- * 生成提示信息
- * @returns {string} - 提示信息
- */
-let cachedHint = null;
-
-function generateHint() {
-    if (cachedHint) return cachedHint;
-
-    let hintText = "解题思路：\n";
-    hintText += "1. 检查每行每列，确保没有连续的三个X或O。\n";
-    hintText += `2. 每行每列必须恰好有${boardSize / 2}个X和${boardSize / 2}个O。\n`;
-    hintText += "3. 如果一行或一列已经有两个X，那么剩下的空格必须填O，反亦然。\n";
-    hintText += "4. 注意每行每列都必须是唯一的，不能有完全相同的行或列。\n";
-    hintText += "5. 利用已填写的格子推理其他格子的可能性，逐步填写。\n";
-    hintText += "6. 如果遇到困难，尝试假设某个空格是X或O，然后看是否会导致矛盾。\n";
-
-    cachedHint = hintText;
-    return hintText;
-}
-
-
-hintButton.addEventListener('click', () => {
-    hintText.innerHTML = generateHint().split('\n').map(line => `<p>${line}</p>`).join('');
-    hintModal.style.display = 'block';
-});
-
-
 document.addEventListener('DOMContentLoaded', () => {
     // 确保在 DOM 加载完成后再添加事件监听器
     const hintButton = document.getElementById('hint-button');
@@ -647,15 +630,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetGameButton = document.getElementById('reset-games');
 
     hintButton.addEventListener('click', () => {
-        hintText.innerHTML = generateHint().split('\n').map(line => `<p>${line}</p>`).join('');
-        hintModal.style.display = 'block';
+        fetch('./leaderboard/get_leaderboard.php?type=personal')
+            .then(response => response.json())
+            .then(data => {
+                console.log('个人排行榜数据:', data);
+                // 这里可以添加代码来处理和显示排行榜数据
+                
+                // 跳转到排行榜页面
+                window.location.href = './leaderboard';
+            })
+            .catch(error => {
+                console.error('获取排行榜失败:', error);
+            });
     });
+        
+    
 
     checkSolutionButton.addEventListener('click', checkSolution);
     resetGameButton.addEventListener('click', resetGame);
 
     initializeBoard(boardSize); // 确保在 DOM 加载完成后初始化棋盘
 });
+
+
 
 // Add these functions at the end of the file
 
@@ -782,3 +779,26 @@ style.textContent = `
 `;
 document.head.appendChild(style);
 
+
+function sendRecord(formattedTime) {
+    const score = formattedTime; // 将用时作为分数
+
+    fetch('http://127.0.0.1:9999/games/OOXX/insert_records.php', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            // user_id: userId,
+            // username: username,
+            score: score,
+        }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        console.log(data.message); // 记录插入成功的消息
+    })
+    .catch(error => {
+        console.error('记录插入失败:', error);
+    });
+}
