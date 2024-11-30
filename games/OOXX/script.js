@@ -205,7 +205,7 @@ function removeTwoRandomCellsPerRow() {
 function getRandomTwoCells(filledCells) {
     // 确保随机选择两个不重复的格子
     const randomIndexes = [];
-    while (randomIndexes.length < 3) {
+    while (randomIndexes.length < 2) { // 修正：只选择两个格子
         const randomIndex = Math.floor(Math.random() * filledCells.length);
         if (!randomIndexes.includes(randomIndex)) {
             randomIndexes.push(randomIndex);
@@ -296,7 +296,7 @@ function hasConsecutiveThree(line) {
     for (let i = 1; i < line.length; i++) {
         if (line[i] === line[i - 1] && line[i] !== '') {
             count++;
-            if (count > 3) {
+            if (count >= 3) { // 修正：改为大于等于3
                 return true; // 找到超过三个相同字符
             }
         } else {
@@ -358,6 +358,9 @@ function handleCellClick(row, col) {
     }
 
     renderBoard();
+    checkConsecutiveThree();
+    checkIdenticalLines();
+    checkExcessiveCount();
 }
 
 
@@ -401,15 +404,7 @@ function renderBoard() {
  * @param {number} row - 行索引
  * @param {number} col - 列索引
  */
-function handleCellClick(row, col) {
-    if (board[row][col] !== '' || fixedBoard[row][col] || isGameSolved) return;
-
-    const currentPlayer = isTimerRunning ? 'X' : 'O'; // 切换玩家
-    board[row][col] = currentPlayer;
-    fixedBoard[row][col] = true;
-    renderBoard();
-    checkGameStatus(); // 检查游戏是否完成
-}
+//This function is now redundant, as it's replaced by the updated handleCellClick function above.
 
 /**
  * 检查游戏是否已解开
@@ -453,25 +448,6 @@ function updateTimer() {
     timerElement.textContent = `${minutes}:${seconds}:${milliseconds}`; // 显示格式为 mm:ss:ms
 }
 
-/**
- * 处理单元格点击事件
- * @param {number} row - 行索引
- * @param {number} col - 列索引
- */
-function handleCellClick(row, col) {
-    startTimer(); // 开始计时
-    if (isGameSolved || fixedBoard[row][col]) return; // 禁止在游戏结束后点击任何格子
-    // 根据当前状态更新格子内容
-    if (board[row][col] === '') {
-        board[row][col] = 'X';
-    } else if (board[row][col] === 'X') {
-        board[row][col] = 'O';
-    } else {
-        board[row][col] = '';
-    }
-
-    renderBoard();
-}
 
 /**
  * 检查一行的有效性
@@ -679,3 +655,129 @@ document.addEventListener('DOMContentLoaded', () => {
 
     initializeBoard(boardSize); // 确保在 DOM 加载完成后初始化棋盘
 });
+
+// Add these functions at the end of the file
+
+// Function to check for three consecutive same characters
+function checkConsecutiveThree() {
+  const cells = document.querySelectorAll('.cell');
+  const flashDuration = 2000; // 2 seconds
+
+  // Check rows and columns
+  for (let i = 0; i < boardSize; i++) {
+    // Check row
+    checkLine(i * boardSize, 1);
+    // Check column
+    checkLine(i, boardSize);
+  }
+
+  function checkLine(start, step) {
+    for (let i = start; i < start + (boardSize - 2) * step; i += step) {
+      if (cells[i].textContent &&
+          cells[i].textContent === cells[i + step].textContent &&
+          cells[i].textContent === cells[i + step * 2].textContent) {
+        flashCells([cells[i], cells[i + step], cells[i + step * 2]], flashDuration);
+      }
+    }
+  }
+}
+
+// Function to check for identical rows or columns
+function checkIdenticalLines() {
+  const cells = document.querySelectorAll('.cell');
+  const flashDuration = 2000; // 2 seconds
+
+  // Check rows
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = i + 1; j < boardSize; j++) {
+      if (compareLines(i * boardSize, j * boardSize, 1)) {
+        flashCells(
+          [...Array(boardSize)].map((_, k) => cells[i * boardSize + k]),
+          flashDuration
+        );
+        flashCells(
+          [...Array(boardSize)].map((_, k) => cells[j * boardSize + k]),
+          flashDuration
+        );
+      }
+    }
+  }
+
+  // Check columns
+  for (let i = 0; i < boardSize; i++) {
+    for (let j = i + 1; j < boardSize; j++) {
+      if (compareLines(i, j, boardSize)) {
+        flashCells(
+          [...Array(boardSize)].map((_, k) => cells[i + k * boardSize]),
+          flashDuration
+        );
+        flashCells(
+          [...Array(boardSize)].map((_, k) => cells[j + k * boardSize]),
+          flashDuration
+        );
+      }
+    }
+  }
+}
+
+function compareLines(start1, start2, step) {
+  const cells = document.querySelectorAll('.cell');
+  for (let i = 0; i < boardSize; i++) {
+    if (cells[start1 + i * step].textContent !== cells[start2 + i * step].textContent) {
+      return false;
+    }
+  }
+  return true;
+}
+
+// Function to check if X or O count exceeds half of the board size in any row or column
+function checkExcessiveCount() {
+  const cells = document.querySelectorAll('.cell');
+  const flashDuration = 2000; // 2 seconds
+  const maxCount = boardSize / 2;
+
+  // Check rows
+  for (let i = 0; i < boardSize; i++) {
+    const rowCells = [...Array(boardSize)].map((_, j) => cells[i * boardSize + j]);
+    checkLineCount(rowCells);
+  }
+
+  // Check columns
+  for (let i = 0; i < boardSize; i++) {
+    const colCells = [...Array(boardSize)].map((_, j) => cells[i + j * boardSize]);
+    checkLineCount(colCells);
+  }
+
+  function checkLineCount(lineCells) {
+    const xCount = lineCells.filter(cell => cell.textContent === 'X').length;
+    const oCount = lineCells.filter(cell => cell.textContent === 'O').length;
+    if (xCount > maxCount || oCount > maxCount) {
+      flashCells(lineCells, flashDuration);
+    }
+  }
+}
+
+// Function to flash cells
+function flashCells(cells, duration) {
+  cells.forEach(cell => {
+    cell.classList.add('flash');
+    setTimeout(() => {
+      cell.classList.remove('flash');
+    }, duration);
+  });
+}
+
+
+// Add CSS class for flashing effect
+const style = document.createElement('style');
+style.textContent = `
+  .flash {
+    animation: flash 0.5s ease-in-out infinite alternate;
+  }
+  @keyframes flash {
+    from { opacity: 1; }
+    to { opacity: 0.5; }
+  }
+`;
+document.head.appendChild(style);
+
