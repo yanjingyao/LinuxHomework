@@ -783,7 +783,7 @@ document.head.appendChild(style);
 function sendRecord(formattedTime) {
     const score = formattedTime; // 将用时作为分数
 
-    fetch('http://127.0.0.1:9999/games/OOXX/insert_records.php', {
+    fetch('./insert_records.php', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

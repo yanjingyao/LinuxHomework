@@ -4,7 +4,7 @@ session_start();
 header('Content-Type: application/json');
 
 // 数据库连接信息
-$servername = "localhost";
+$servername = "113.45.187.135";
 $username = "ooxxdb";
 $password = "pwdooxxdb";
 $dbname = "ooxxdb";
